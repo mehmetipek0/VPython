@@ -1,0 +1,39 @@
+from visual import *
+import random
+import numpy as np
+
+redBa=sphere(pos=(3,3), radius=0.5, color=color.red)
+redBa.vel=vector(random.random(),random.random())
+mr = 0.1
+
+blueBa=sphere(pos=(0,0), radius=1.5, color=color.blue, make_trail=True, retain=1000)
+blueBa.vel=vector(random.random(),random.random())
+mb = 1
+
+m = mr + mb
+
+wallTop = box(pos=(0,5,0), size=(10,0.5,2),material=materials.plastic)
+wallGround = box(pos=(0,-5,0), size=(10,0.5,2),material=materials.plastic)
+wallRight = box(pos=(5,0,0), size=(0.5,10,2),material=materials.plastic)
+wallLeft = box(pos=(-5,0,0), size=(0.5,10,2),material=materials.plastic)
+
+scene = display(width=500,height=500)
+for counter in arange(0,100000,0.01):
+    rate(1000)
+    
+    redVelOld = redBa.vel
+    blueVelOld = blueBa.vel
+    
+    redBa.pos = redBa.pos + redBa.vel*0.01
+    blueBa.pos = blueBa.pos + blueBa.vel*0.01
+    if abs(redBa.pos.x) >= wallRight.pos.x-1:
+        redBa.vel.x = -redBa.vel.x
+    if abs(blueBa.pos.x) >= wallRight.pos.x-1:    
+        blueBa.vel.x = -blueBa.vel.x
+    if abs(redBa.pos.y) >= wallTop.pos.y-1:
+        redBa.vel.y = -redBa.vel.y
+    if abs(blueBa.pos.y) >= wallTop.pos.y-1:    
+        blueBa.vel.y = -blueBa.vel.y
+    if abs(redBa.pos-blueBa.pos) < abs(redBa.radius+blueBa.radius):
+        redBa.vel=redVelOld-(2*mb/m)*np.dot(redVelOld-blueVelOld,(redBa.pos-blueBa.pos)/abs(redBa.pos-blueBa.pos))*((redBa.pos-blueBa.pos)/abs(redBa.pos-blueBa.pos))
+        blueBa.vel=blueVelOld-(2*mr/m)*np.dot(blueVelOld-redVelOld,(blueBa.pos-redBa.pos)/abs(blueBa.pos-redBa.pos))*((blueBa.pos-redBa.pos)/abs(blueBa.pos-redBa.pos))
